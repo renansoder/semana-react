@@ -17,7 +17,6 @@
     "react-toastify": "^9.1.1"
   },
   "devDependencies": {
-    "@types/long": "^5.0.0",
     "@types/react": "^18.0.24",
     "@types/react-dom": "^18.0.8",
     "@typescript-eslint/eslint-plugin": "^5.42.1",
