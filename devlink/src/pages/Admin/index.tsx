@@ -1,10 +1,13 @@
-import { useState } from 'react'
+import { FormEvent, useState } from 'react'
 import { Header } from '../../components/Header'
 import './admin.css'
 import { Logo } from '../../components/Logo'
 import { Input } from '../../components/Input'
 import { MdAddLink } from 'react-icons/md'
 import { FiTrash2 } from 'react-icons/fi'
+import { db } from '../../services/firebaseConnection'
+import { addDoc, collection, onSnapshot, query, orderBy, doc, deleteDoc } from 'firebase/firestore'
+import { toast } from 'react-toastify'
 
 export const Admin = () => {
   const [nameInput, setNameInput] = useState('')
@@ -12,11 +15,36 @@ export const Admin = () => {
   const [backgroundInput, setBackgorundInput] = useState('#f1f1f1')
   const [textInput, setTextInput] = useState('#121212')
 
+  async function handleRegister(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    if (nameInput === null || urlInput === null) {
+      toast.warn('Preencha todos os campos!')
+      return
+    }
+    // addDoc cria o ID aleatório
+    addDoc(collection(db, 'links'), {
+      name: nameInput,
+      url: urlInput,
+      bg: backgroundInput,
+      color: textInput,
+      createdAt: new Date()
+    })
+      .then(() => {
+        setNameInput('')
+        setUrlInput('')
+        toast.success('Link registrado!')
+      })
+      .catch(error => {
+        console.log('Erro no registro: ' + error)
+        toast.error('Erro ao cadastrar o Link!')
+      })
+  }
+
   return (
     <div className='admin-container'>
       <Header />
       <Logo />
-      <form className='form'>
+      <form className='form' onSubmit={handleRegister}>
         <label className='label'>Nome do Link</label>
         <Input
           placeholder='Nome do Link...'
@@ -32,7 +60,9 @@ export const Admin = () => {
         />
         <section className='container-colors'>
           <div className='input-color'>
-            <label className='label right'>Fundo do Link</label>
+            <label className='label right'>
+              <span> Fundo do Link</span>
+            </label>
             <Input
               placeholder='Nome do Link...'
               type='color'
@@ -41,7 +71,9 @@ export const Admin = () => {
             />
           </div>
           <div className='input-color'>
-            <label className='label right'>Cor do Link</label>
+            <label className='label right'>
+              <span>Cor do Link</span>
+            </label>
             <Input
               placeholder='Nome do Link...'
               type='color'
@@ -51,18 +83,21 @@ export const Admin = () => {
           </div>
         </section>
         {nameInput !== '' && (
-          <div className='preview'>
+          <div className='preview animate-pop'>
             <label className='label'>Veja como está ficando... 👇</label>
             <article
               className='list'
               style={{ marginBottom: 7, marginTop: 8, backgroundColor: backgroundInput }}
             >
-              <p style={{ color: textInput }}>{nameInput}</p>
+              <p style={{ color: textInput }}>
+                {' '}
+                <span>{nameInput}</span>{' '}
+              </p>
             </article>
           </div>
         )}
         <button className='btn-register' type='submit'>
-          Cadastrar <MdAddLink size={24} color='#FFF' />
+          Cadastrar Link <MdAddLink size={24} color='#FFF' />
         </button>
       </form>
       <h2 className='title'>Meus LINKS</h2>

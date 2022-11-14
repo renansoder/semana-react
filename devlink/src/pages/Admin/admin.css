@@ -18,6 +18,9 @@
   margin: 14px 0;
   gap: 22px;
 }
+.input-color .label span {
+  font-style: italic;
+}
 
 .input-color Input {
   height: 28px;
@@ -65,6 +68,10 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
+}
+
+.preview .list span {
+  font-weight: bold;
 }
 
 .btn-delete {
