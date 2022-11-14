@@ -3,7 +3,7 @@ import { auth } from '../services/firebaseConnection'
 import { onAuthStateChanged } from 'firebase/auth'
 import { Navigate } from 'react-router-dom'
 
-// onAuthStateChanged -> verifica se tem usuário logado
+// onAuthStateChanged -> observa se tem usuário logado
 
 export const Private = ({ children }: any) => {
   const [loading, setLoading] = useState(true)
@@ -11,7 +11,7 @@ export const Private = ({ children }: any) => {
 
   useEffect(() => {
     async function checkLogin() {
-      const unsub = onAuthStateChanged(auth, user => {
+      onAuthStateChanged(auth, user => {
         if (user) {
           const userData = {
             uid: user.uid,
@@ -27,6 +27,7 @@ export const Private = ({ children }: any) => {
         }
       })
     }
+    checkLogin()
   }, [])
 
   if (loading) {
