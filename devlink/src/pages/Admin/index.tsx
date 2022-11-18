@@ -1,4 +1,4 @@
-import { FormEvent, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 import { Header } from '../../components/Header'
 import './admin.css'
 import { Logo } from '../../components/Logo'
@@ -9,11 +9,41 @@ import { db } from '../../services/firebaseConnection'
 import { addDoc, collection, onSnapshot, query, orderBy, doc, deleteDoc } from 'firebase/firestore'
 import { toast } from 'react-toastify'
 
+interface ILista {
+  id: string
+  name: string
+  url: string
+  bg: string
+  color: string
+  createdAt?: Date
+}
+
 export const Admin = () => {
   const [nameInput, setNameInput] = useState('')
   const [urlInput, setUrlInput] = useState('')
   const [backgroundInput, setBackgorundInput] = useState('#f1f1f1')
   const [textInput, setTextInput] = useState('#121212')
+  const [links, setLinks] = useState<ILista[]>([])
+
+  useEffect(() => {
+    const linksRef = collection(db, 'links')
+    const queryRef = query(linksRef, orderBy('createdAt', 'asc'))
+
+    // onSnapshot fica observando o banco, e se mudou algo ele vai ser executado novamente, atualizando.
+    const unsub = onSnapshot(queryRef, snapshot => {
+      let lista: ILista[] = []
+      snapshot.forEach(doc => {
+        lista.push({
+          id: doc.id,
+          name: doc.data().name,
+          url: doc.data().url,
+          bg: doc.data().bg,
+          color: doc.data().color
+        })
+      })
+      setLinks(lista)
+    })
+  }, [])
 
   async function handleRegister(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -38,6 +68,12 @@ export const Admin = () => {
         console.log('Erro no registro: ' + error)
         toast.error('Erro ao cadastrar o Link!')
       })
+  }
+
+  async function handleDeleteLink(id: string) {
+    const docRef = doc(db, 'links', id)
+    await deleteDoc(docRef)
+    toast.success('Link excluído!')
   }
 
   return (
@@ -101,14 +137,20 @@ export const Admin = () => {
         </button>
       </form>
       <h2 className='title'>Meus LINKS</h2>
-      <article className='list animate-pop' style={{ backgroundColor: '#000', color: 'red' }}>
-        <p>Grupo exclusivo</p>
-        <div>
-          <button className='btn-delete'>
-            <FiTrash2 size={18} color='#FFF' />
-          </button>
-        </div>
-      </article>
+      {links.map((item, index) => (
+        <article
+          key={index}
+          className='list animate-pop'
+          style={{ backgroundColor: item.bg, color: item.color }}
+        >
+          <p>{item.name}</p>
+          <div>
+            <button className='btn-delete' onClick={() => handleDeleteLink(item.id)}>
+              <FiTrash2 size={18} color='#FFF' />
+            </button>
+          </div>
+        </article>
+      ))}
     </div>
   )
 }
