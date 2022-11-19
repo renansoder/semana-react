@@ -9,7 +9,7 @@ import { db } from '../../services/firebaseConnection'
 import { addDoc, collection, onSnapshot, query, orderBy, doc, deleteDoc } from 'firebase/firestore'
 import { toast } from 'react-toastify'
 
-interface ILista {
+export interface ILista {
   id: string
   name: string
   url: string
@@ -30,7 +30,7 @@ export const Admin = () => {
     const queryRef = query(linksRef, orderBy('createdAt', 'asc'))
 
     // onSnapshot fica observando o banco, e se mudou algo ele vai ser executado novamente, atualizando. É um realTime.
-    const unsub = onSnapshot(queryRef, snapshot => {
+    onSnapshot(queryRef, snapshot => {
       let lista: ILista[] = []
       snapshot.forEach(doc => {
         lista.push({
