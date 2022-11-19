@@ -29,7 +29,7 @@ export const Admin = () => {
     const linksRef = collection(db, 'links')
     const queryRef = query(linksRef, orderBy('createdAt', 'asc'))
 
-    // onSnapshot fica observando o banco, e se mudou algo ele vai ser executado novamente, atualizando.
+    // onSnapshot fica observando o banco, e se mudou algo ele vai ser executado novamente, atualizando. É um realTime.
     const unsub = onSnapshot(queryRef, snapshot => {
       let lista: ILista[] = []
       snapshot.forEach(doc => {
